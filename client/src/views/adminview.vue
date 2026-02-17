@@ -2,7 +2,12 @@
   <div class="min-h-screen bg-syntrx-50 p-4">
     <div class="max-w-4xl mx-auto">
       <header class="glass rounded-xl p-6 mb-6 flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-syntrx-800">管理员控制台</h1>
+        <div>
+          <h1 class="text-2xl font-bold text-syntrx-800">管理员控制台</h1>
+          <div class="text-xs text-syntrx-400 mt-0.5">
+            Powered by <a href="https://github.com/Syntrx888/ChatterBox" target="_blank" rel="noopener noreferrer" class="text-syntrx-400 hover:text-syntrx-500 underline decoration-dotted underline-offset-2">ChatterBox</a>
+          </div>
+        </div>
         <div v-if="isAdminAuthenticated" class="flex items-center gap-3">
           <button
             @click="handleRefresh"

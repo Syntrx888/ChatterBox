@@ -16,9 +16,9 @@
               </div>
               <h1 class="text-3xl font-bold text-gray-800 mb-3">嗨，你好！</h1>
               <h2 class="text-2xl font-bold text-syntrx-600 mb-4">欢迎来到 {{ config.chatRoomName }}</h2>
-              <p class="text-gray-600 mb-8">只需 4 步，即可开启畅聊。</p>
+              <p class="text-gray-600 mb-8">只需 {{ config.enableInviteCode ? 5 : 4 }} 步，即可开启畅聊。</p>
               <button
-                @click="currentStep = 'username'"
+                @click="config.enableInviteCode ? (currentStep = 'inviteCode') : (currentStep = 'username')"
                 class="w-full bg-syntrx-600 hover:bg-syntrx-700 text-white py-3 rounded-xl font-medium transition-all"
               >
                 开始注册
@@ -34,7 +34,7 @@
             </div>
 
             <div v-if="currentStep === 'username'" class="py-4">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">第一步：取个名字吧</h2>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">{{ config.enableInviteCode ? '第二步' : '第一步' }}：取个名字吧</h2>
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">昵称</label>
@@ -69,7 +69,7 @@
             </div>
 
             <div v-if="currentStep === 'password'" class="py-4">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">第二步：设置密码</h2>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">{{ config.enableInviteCode ? '第三步' : '第二步' }}：设置密码</h2>
               <div class="space-y-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
@@ -94,17 +94,52 @@
               </div>
             </div>
 
+            <div v-if="currentStep === 'inviteCode'" class="py-4">
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">第一步：输入邀请码</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">邀请码</label>
+                  <input
+                    v-model="formData.inviteCode"
+                    @input="checkInviteCode"
+                    type="text"
+                    placeholder="请输入邀请码"
+                    class="w-full px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-syntrx-500 focus:border-transparent outline-none transition-all"
+                    :class="inviteCodeStatus.valid ? 'border-green-500' : inviteCodeStatus.checking ? 'border-yellow-500' : inviteCodeStatus.valid === false ? 'border-red-500' : 'border-gray-300'"
+                  />
+                  <div class="mt-2 flex items-center gap-2 text-sm">
+                    <span v-if="inviteCodeStatus.checking" class="text-yellow-600">验证中...</span>
+                    <span v-else-if="inviteCodeStatus.valid === true" class="text-green-600 flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 00016zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                      邀请码有效
+                    </span>
+                    <span v-else-if="inviteCodeStatus.valid === false" class="text-red-600 flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 00016zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                      邀请码无效
+                    </span>
+                  </div>
+                </div>
+                <button
+                  @click="currentStep = 'username'"
+                  :disabled="!isInviteCodeValid"
+                  class="w-full bg-syntrx-600 hover:bg-syntrx-700 disabled:bg-gray-300 text-white py-3 rounded-xl font-medium transition-all"
+                >
+                  下一步 ->
+                </button>
+              </div>
+            </div>
+
             <div v-if="currentStep === 'avatar'" class="py-4">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">第三步：亮出你的形象</h2>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">{{ config.enableInviteCode ? '第四步' : '第三步' }}：亮出你的形象</h2>
               <div class="space-y-6">
-                <div class="flex items-center gap-6">
+                <div class="flex flex-col md:flex-row items-center gap-6">
                   <div class="flex-shrink-0">
                     <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-syntrx-200 shadow-lg flex items-center justify-center bg-gray-100">
                       <img v-if="formData.avatar && formData.avatar !== ''" :src="formData.avatar" class="w-full h-full object-cover" alt="头像预览" />
                       <span v-else class="text-gray-500 font-bold text-sm text-center px-2 leading-tight">请输入头像URL</span>
                     </div>
                   </div>
-                  <div class="flex-1 space-y-3">
+                  <div class="flex-1 w-full space-y-3">
                     <button
                       @click="selectDefaultAvatar"
                       :class="[
@@ -172,7 +207,7 @@
             </div>
 
             <div v-if="currentStep === 'description'" class="py-4">
-              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">第四步：一句话介绍自己</h2>
+              <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">{{ config.enableInviteCode ? '第五步' : '第四步' }}：一句话介绍自己</h2>
               <p class="text-center text-gray-500 text-sm mb-6">（选填）让大家更快了解你，或者留个有趣的签名</p>
               <div class="space-y-4">
                 <div>
@@ -275,7 +310,8 @@ const formData = ref({
   username: '',
   password: '',
   avatar: '',
-  self_description: ''
+  self_description: '',
+  inviteCode: ''
 })
 
 const loginForm = ref({
@@ -293,13 +329,20 @@ const usernameStatus = ref({
   error: ''
 })
 
+const inviteCodeStatus = ref({
+  checking: false,
+  valid: null
+})
+
 const customAvatarUrl = ref('')
 const showCustomAvatarInput = ref(false)
 
 const defaultAvatar = config.defaultAvatar
 
 const progressWidth = computed(() => {
-  const steps = ['welcome', 'username', 'password', 'avatar', 'description']
+  const steps = config.enableInviteCode 
+    ? ['welcome', 'username', 'password', 'inviteCode', 'avatar', 'description']
+    : ['welcome', 'username', 'password', 'avatar', 'description']
   const currentIndex = steps.indexOf(currentStep.value)
   return `${((currentIndex + 1) / steps.length) * 100}%`
 })
@@ -314,6 +357,13 @@ const isUsernameValid = computed(() => {
 const isPasswordValid = computed(() => {
   const pwd = formData.value.password.trim()
   return pwd.length >= 6
+})
+
+const isInviteCodeValid = computed(() => {
+  if (!config.enableInviteCode) {
+    return true
+  }
+  return inviteCodeStatus.value.valid === true
 })
 
 const passwordStrength = computed(() => {
@@ -358,6 +408,7 @@ const customAvatarUrlError = computed(() => {
 })
 
 let usernameCheckTimer = null
+let inviteCodeCheckTimer = null
 
 const checkUsername = () => {
   const username = formData.value.username.trim()
@@ -384,6 +435,33 @@ const checkUsername = () => {
       } else {
         usernameStatus.value = { checking: false, available: true, error: '' }
       }
+    }
+  }, 500)
+}
+
+const checkInviteCode = () => {
+  if (!config.enableInviteCode) {
+    return
+  }
+
+  const inviteCode = formData.value.inviteCode.trim()
+  
+  if (!inviteCode) {
+    inviteCodeStatus.value = { checking: false, valid: false }
+    return
+  }
+
+  inviteCodeStatus.value = { checking: true, valid: null }
+  
+  clearTimeout(inviteCodeCheckTimer)
+  inviteCodeCheckTimer = setTimeout(async () => {
+    try {
+      const response = await axios.get(`${config.API_BASE_URL}/api/check-invite-code`, {
+        params: { inviteCode }
+      })
+      inviteCodeStatus.value = { checking: false, valid: response.data.valid }
+    } catch (error) {
+      inviteCodeStatus.value = { checking: false, valid: false }
     }
   }, 500)
 }
@@ -416,12 +494,16 @@ const handleRegister = async () => {
     return
   }
 
+  if (config.enableInviteCode && !isInviteCodeValid.value) {
+    return
+  }
+
   loading.value = true
   
   try {
     const trimmedUsername = formData.value.username.trim()
     const trimmedPassword = formData.value.password.trim()
-    const result = await register(trimmedUsername, trimmedPassword, formData.value.avatar, formData.value.self_description)
+    const result = await register(trimmedUsername, trimmedPassword, formData.value.avatar, formData.value.self_description, formData.value.inviteCode)
     if (result.success) {
       router.push('/chat')
     }

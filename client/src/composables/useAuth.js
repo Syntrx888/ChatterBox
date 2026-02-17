@@ -58,13 +58,14 @@ export function useAuth() {
     }
   }
 
-  const register = async (usernameInput, password, avatarInput, selfDescription = '') => {
+  const register = async (usernameInput, password, avatarInput, selfDescription = '', inviteCode = '') => {
     try {
       const response = await axios.post(`${config.API_BASE_URL}/api/register`, {
         username: usernameInput,
         password,
         avatar: avatarInput,
-        self_description: selfDescription
+        self_description: selfDescription,
+        inviteCode
       })
       setAuth(response.data.token, response.data.username, response.data.userId, response.data.avatar)
       return { success: true }

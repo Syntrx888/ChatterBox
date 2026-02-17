@@ -8,6 +8,9 @@
           </div>
           <div>
             <h1 class="text-xl font-bold text-syntrx-800">{{ config.chatRoomName }}</h1>
+            <div class="text-xs text-syntrx-400 mt-0.5">
+              Powered by <a href="https://github.com/Syntrx888/ChatterBox" target="_blank" rel="noopener noreferrer" class="text-syntrx-400 hover:text-syntrx-500 underline decoration-dotted underline-offset-2">ChatterBox</a>
+            </div>
           </div>
         </div>
         <div class="flex items-center gap-2">

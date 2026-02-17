@@ -62,7 +62,7 @@ export default {
 module.exports = {
   port: 3000,
   host: '0.0.0.0',
-  jwtSecret: 'chatterbox-secret-key-2024',
+  jwtSecret: 'syntrx-secret-key-2024',
   defaultAvatar: ''
 }
 ```

@@ -17,6 +17,7 @@
 - **极简设计**：采用大量留白和柔和的色彩对比
 - **实时通信**：基于 Socket.IO 的实时消息推送
 - **用户管理**：支持用户注册、登录、头像设置、个人简介
+- **邀请码系统**（可选）：可配置启用邀请码功能，限制注册
 - **管理员系统**：
   - 管理员登录和密码设置
   - 查看所有聊天消息
@@ -46,6 +47,7 @@ ChatterBox/
 ├── screenshots/           # 项目截图
 ├── README.md             # 项目文档
 └── CONFIG.md             # 详细配置指南
+└──setup.js         #引导程序
 ```
 
 > **提示**: 想了解更多配置细节和部署方案，请查看 [CONFIG.md](./CONFIG.md) 详细配置指南。
@@ -56,6 +58,47 @@ ChatterBox/
 
 - Node.js >= 16
 - npm 或 yarn
+
+### 一键配置和打包（推荐）
+
+我们提供了交互式配置向导，可以引导您完成前后端配置并自动打包：
+
+```bash
+node setup.js
+```
+
+配置向导会引导您完成以下步骤：
+1. 设置后端服务器地址
+2. 设置聊天室名称
+3. 设置网站图标 URL（可选）
+4. 设置默认头像 URL（可选）
+5. 设置是否启用邀请码功能（可选）
+6. 如果启用邀请码，输入邀请码列表
+7. 自动安装前后端依赖
+8. 自动打包前端
+
+打包完成后：
+- 前端打包后的文件位于 `client/dist/` 目录
+- 后端配置文件位于 `server/config.js`
+
+### 启动服务
+
+#### 启动后端
+
+```bash
+cd server
+npm start
+```
+
+后端服务将在 `http://localhost:3000` 启动
+
+#### 启动前端
+使用任意网站服务器将dist目录作为网站目录
+
+
+### 手动配置
+
+如果您想手动配置，请参考下面的配置说明。
 
 ### 安装依赖
 
@@ -82,7 +125,8 @@ export default {
   API_BASE_URL: 'http://localhost:3000',  // 后端 API 地址
   chatRoomName: 'ChatterBox',              // 聊天室名称
   faviconUrl: '',                          // 网站图标 URL
-  defaultAvatar: ''                        // 默认头像 URL
+  defaultAvatar: '',                       // 默认头像 URL
+  enableInviteCode: false                  // 是否启用邀请码功能
 }
 ```
 
@@ -93,38 +137,31 @@ module.exports = {
   port: 3000,               // 服务端口
   host: '0.0.0.0',         // 服务地址
   jwtSecret: 'your-secret-key',  // JWT 密钥（生产环境请修改）
-  defaultAvatar: ''          // 默认头像 URL
+  enableInviteCode: false,   // 是否启用邀请码功能
+  inviteCodes: []           // 邀请码列表
 }
 ```
 
-### 启动服务
+#### 邀请码配置
 
-#### 启动后端
+如果需要启用邀请码功能，请按以下步骤配置：
 
-```bash
-cd server
-npm start
-```
+1. **前端配置**：将 `enableInviteCode` 设置为 `true`
+2. **后端配置**：
+   - 将 `enableInviteCode` 设置为 `true`
+   - 在 `inviteCodes` 数组中添加邀请码，例如：
+   ```javascript
+   inviteCodes: ['CODE123', 'CODE456', 'CODE789']
+   ```
 
-后端服务将在 `http://localhost:3000` 启动
+启用后，用户注册时需要输入有效的邀请码才能完成注册。
 
-#### 启动前端（开发模式）
-
-```bash
-cd client
-npm run dev
-```
-
-前端开发服务器将在 `http://localhost:5173` 启动
-
-#### 构建前端（生产模式）
-
+### 手动构建前端
 ```bash
 cd client
 npm run build
 ```
 
-构建后的文件在 `client/dist` 目录
 
 ## API 文档
 
@@ -139,7 +176,8 @@ npm run build
   "username": "string",
   "password": "string",
   "avatar": "string (可选)",
-  "self_description": "string (可选)"
+  "self_description": "string (可选)",
+  "inviteCode": "string (可选，如果启用邀请码功能则为必填)"
 }
 ```
 
@@ -200,6 +238,17 @@ npm run build
 ```json
 {
   "available": true
+}
+```
+
+#### GET /api/check-invite-code?inviteCode=xxx
+检查邀请码是否有效
+
+**响应：**
+```json
+{
+  "enabled": true,
+  "valid": true
 }
 ```
 

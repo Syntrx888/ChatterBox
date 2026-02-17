@@ -148,8 +148,23 @@ app.get('/api/check-username', (req, res) => {
   });
 });
 
+app.get('/api/check-invite-code', (req, res) => {
+  const { inviteCode } = req.query;
+
+  if (!config.enableInviteCode) {
+    return res.json({ enabled: false, valid: true });
+  }
+
+  if (!inviteCode) {
+    return res.json({ enabled: true, valid: false });
+  }
+
+  const valid = config.inviteCodes.includes(inviteCode);
+  res.json({ enabled: true, valid });
+});
+
 app.post('/api/register', async (req, res) => {
-  const { username, password, avatar, self_description } = req.body;
+  const { username, password, avatar, self_description, inviteCode } = req.body;
   const trimmedUsername = username ? username.trim() : '';
   const trimmedPassword = password ? password.trim() : '';
 
@@ -165,6 +180,15 @@ app.post('/api/register', async (req, res) => {
     return res.status(400).json({ error: '密码长度至少为6位' });
   }
 
+  if (config.enableInviteCode) {
+    if (!inviteCode) {
+      return res.status(400).json({ error: '请输入邀请码' });
+    }
+    if (!config.inviteCodes.includes(inviteCode)) {
+      return res.status(400).json({ error: '邀请码无效' });
+    }
+  }
+
   db.get('SELECT * FROM users WHERE LOWER(username) = LOWER(?)', [trimmedUsername], async (err, user) => {
     if (err) {
       return res.status(500).json({ error: '数据库错误' });
@@ -175,7 +199,7 @@ app.post('/api/register', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const userAvatar = avatar || config.defaultAvatar;
+    const userAvatar = avatar || '';
 
     db.run('INSERT INTO users (username, password, avatar, self_description) VALUES (?, ?, ?, ?)', [trimmedUsername, hashedPassword, userAvatar, self_description || ''], function(err) {
       if (err) {

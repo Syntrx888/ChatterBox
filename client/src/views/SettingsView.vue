@@ -3,7 +3,12 @@
     <div class="max-w-lg mx-auto">
       <header class="bg-white rounded-xl shadow-lg p-6 mb-6">
         <div class="flex items-center justify-between mb-2">
-          <h1 class="text-2xl font-bold text-syntrx-800">个人设置</h1>
+          <div>
+            <h1 class="text-2xl font-bold text-syntrx-800">个人设置</h1>
+            <div class="text-xs text-syntrx-400 mt-0.5">
+              Powered by <a href="https://github.com/Syntrx888/ChatterBox" target="_blank" rel="noopener noreferrer" class="text-syntrx-400 hover:text-syntrx-500 underline decoration-dotted underline-offset-2">ChatterBox</a>
+            </div>
+          </div>
           <router-link
             to="/chat"
             class="px-4 py-2 bg-syntrx-100 hover:bg-syntrx-200 text-syntrx-700 rounded-lg transition-colors"
