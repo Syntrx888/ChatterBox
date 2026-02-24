@@ -28,8 +28,9 @@
 - **高度可配置**：支持自定义聊天室名称、图标、头像等
 - **多平台支持**：
   - Web 端：Vue 3 + Vite
-  - Android 端
+  - Android 端：NativeScript 原生应用（非 WebView）
   - Android 原生消息通知
+  - 前台服务保持连接
 
 ## 项目结构
 
@@ -48,7 +49,15 @@ ChatterBox/
 │   ├── index.js           # 服务器入口
 │   ├── database.js        # 数据库配置
 │   └── package.json
-├── android/               # Android 应用
+├── android/               # Android 原生应用
+│   ├── app/
+│   │   ├── components/    # Vue 组件
+│   │   ├── views/         # 页面视图
+│   │   ├── services/      # 服务（通知、前台服务）
+│   │   ├── config.js      # Android 配置文件
+│   │   └── App_Resources/ # Android 资源
+│   ├── setup.js           # Android 配置向导
+│   └── README.md         # Android 应用文档
 ├── screenshots/           # 项目截图
 ├── README.md             # 项目文档
 ├── CONFIG.md             # 详细配置指南
@@ -100,11 +109,13 @@ npm start
 #### 启动前端
 使用任意网站服务器将dist目录作为网站目录
 
-#### 打包 Android 应用
+#### 启动 Android 应用
 
 ```bash
 cd android
-node build.js
+npm install
+node setup.js
+npm run android
 ```
 
 详细说明请查看 [android/README.md](./android/README.md)

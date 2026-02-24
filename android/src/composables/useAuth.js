@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '../api'
 import config from '../config'
 import { io } from 'socket.io-client'
 
@@ -36,40 +36,49 @@ export function useAuth() {
 
   const verifyToken = async () => {
     try {
-      const response = await axios.post(`${config.API_BASE_URL}/api/verify-token`, {
+      console.log('🔍 开始验证 token...')
+      const response = await api.post('/api/verify-token', {
         token: token.value
       })
+      console.log('✅ Token 验证成功:', response.data)
       return response.data.valid
     } catch (error) {
+      console.error('❌ Token 验证失败:', error)
       return false
     }
   }
 
   const login = async (usernameInput, password) => {
     try {
-      const response = await axios.post(`${config.API_BASE_URL}/api/login`, {
+      console.log('🔐 开始登录:', usernameInput)
+      const response = await api.post('/api/login', {
         username: usernameInput,
         password
       })
+      console.log('✅ 登录成功:', response.data)
       setAuth(response.data.token, response.data.username, response.data.userId, response.data.avatar)
       return { success: true }
     } catch (error) {
+      console.error('❌ 登录失败:', error)
       return { success: false, error: error.response?.data?.error || '登录失败' }
     }
   }
 
   const register = async (usernameInput, password, avatarInput, selfDescription = '', inviteCode = '') => {
     try {
-      const response = await axios.post(`${config.API_BASE_URL}/api/register`, {
+      console.log('📝 开始注册:', usernameInput)
+      const response = await api.post('/api/register', {
         username: usernameInput,
         password,
         avatar: avatarInput,
         self_description: selfDescription,
         inviteCode
       })
+      console.log('✅ 注册成功:', response.data)
       setAuth(response.data.token, response.data.username, response.data.userId, response.data.avatar)
       return { success: true }
     } catch (error) {
+      console.error('❌ 注册失败:', error)
       return { success: false, error: error.response?.data?.error || '注册失败' }
     }
   }
@@ -100,6 +109,7 @@ export function useSocket() {
   const messages = ref([])
 
   const connect = (token) => {
+    console.log('🔌 连接 WebSocket...')
     if (socket.value) {
       socket.value.disconnect()
     }
@@ -110,14 +120,17 @@ export function useSocket() {
     })
 
     socket.value.on('connect', () => {
+      console.log('✅ WebSocket 已连接')
       connected.value = true
     })
 
     socket.value.on('disconnect', () => {
+      console.log('❌ WebSocket 已断开')
       connected.value = false
     })
 
     socket.value.on('error', (errorData) => {
+      console.error('❌ WebSocket 错误:', errorData)
       alert(errorData.message || '发生错误')
       localStorage.removeItem('token')
       localStorage.removeItem('username')
@@ -127,14 +140,17 @@ export function useSocket() {
     })
 
     socket.value.on('historyMessages', (historyMessages) => {
+      console.log('📜 收到历史消息:', historyMessages.length)
       messages.value = historyMessages
     })
 
     socket.value.on('newMessage', (message) => {
+      console.log('💬 收到新消息:', message)
       messages.value.push(message)
     })
 
     socket.value.on('messageDeleted', ({ messageId }) => {
+      console.log('🗑️ 消息已删除:', messageId)
       const msgIndex = messages.value.findIndex(m => m.id === messageId)
       if (msgIndex !== -1) {
         messages.value.splice(msgIndex, 1)
@@ -142,6 +158,7 @@ export function useSocket() {
     })
 
     socket.value.on('connect_error', (error) => {
+      console.error('❌ WebSocket 连接错误:', error)
       connected.value = false
     })
   }
@@ -158,6 +175,7 @@ export function useSocket() {
   const sendMessage = (content) => {
     if (socket.value && connected.value) {
       const token = localStorage.getItem('token')
+      console.log('📤 发送消息:', content)
       socket.value.emit('sendMessage', { content, token })
     }
   }
@@ -178,7 +196,7 @@ export function useAdmin() {
 
   const checkSetup = async () => {
     try {
-      const response = await axios.get(`${config.API_BASE_URL}/api/admin/check-setup`)
+      const response = await api.get('/api/admin/check-setup')
       return response.data.isSetup
     } catch (error) {
       return false
@@ -187,7 +205,7 @@ export function useAdmin() {
 
   const setupAdmin = async (password) => {
     try {
-      await axios.post(`${config.API_BASE_URL}/api/admin/setup`, { password })
+      await api.post('/api/admin/setup', { password })
       return { success: true }
     } catch (error) {
       return { success: false, error: error.response?.data?.error || '设置失败' }
@@ -196,7 +214,7 @@ export function useAdmin() {
 
   const adminLogin = async (password) => {
     try {
-      const response = await axios.post(`${config.API_BASE_URL}/api/admin/login`, { password })
+      const response = await api.post('/api/admin/login', { password })
       adminToken.value = response.data.token
       localStorage.setItem('adminToken', response.data.token)
       return { success: true }
@@ -207,7 +225,7 @@ export function useAdmin() {
 
   const getAllMessages = async () => {
     try {
-      const response = await axios.get(`${config.API_BASE_URL}/api/admin/messages`, {
+      const response = await api.get('/api/admin/messages', {
         headers: {
           Authorization: `Bearer ${adminToken.value}`
         }
@@ -220,7 +238,7 @@ export function useAdmin() {
 
   const revokeMessage = async (messageId) => {
     try {
-      await axios.post(`${config.API_BASE_URL}/api/admin/revoke-message`, { messageId }, {
+      await api.post('/api/admin/revoke-message', { messageId }, {
         headers: {
           Authorization: `Bearer ${adminToken.value}`
         }

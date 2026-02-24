@@ -136,8 +136,9 @@ export default {
   enableInviteCode: ${enableInviteCode}
 }
 `;
-    fs.writeFileSync(path.join(__dirname, 'client', 'src', 'config.js'), frontendConfig, 'utf8');
-    console.log('✅ 前端配置完成');
+    const frontendConfigPath = path.join(__dirname, 'client', 'src', 'config.js');
+    fs.writeFileSync(frontendConfigPath, frontendConfig, 'utf8');
+    console.log('✅ 前端配置完成:', frontendConfigPath);
 
     console.log('');
     console.log('📝 配置后端...');
@@ -150,12 +151,20 @@ export default {
   inviteCodes: ${inviteCodesArray}
 }
 `;
-    fs.writeFileSync(path.join(__dirname, 'server', 'config.js'), backendConfig, 'utf8');
-    console.log('✅ 后端配置完成');
+    const backendConfigPath = path.join(__dirname, 'server', 'config.js');
+    fs.writeFileSync(backendConfigPath, backendConfig, 'utf8');
+    console.log('✅ 后端配置完成:', backendConfigPath);
 
     if (fs.existsSync(androidAppPath)) {
       console.log('');
       console.log('📝 配置 Android 应用...');
+      
+      const androidSrcPath = path.join(androidAppPath, 'src');
+      if (!fs.existsSync(androidSrcPath)) {
+        console.log('⚠️  Android src 目录不存在，正在创建...');
+        fs.mkdirSync(androidSrcPath, { recursive: true });
+      }
+      
       const androidConfig = `const API_BASE_URL = '${normalizedApiUrl}';
 
 export default {
@@ -166,8 +175,12 @@ export default {
   enableInviteCode: ${enableInviteCode}
 }
 `;
-      fs.writeFileSync(path.join(androidAppPath, 'src', 'config.js'), androidConfig, 'utf8');
-      console.log('✅ Android 应用配置完成');
+      const androidConfigPath = path.join(androidAppPath, 'src', 'config.js');
+      fs.writeFileSync(androidConfigPath, androidConfig, 'utf8');
+      console.log('✅ Android 应用配置完成:', androidConfigPath);
+    } else {
+      console.log('');
+      console.log('⚠️  Android 应用目录不存在，跳过 Android 配置');
     }
 
     console.log('');
@@ -190,7 +203,7 @@ export default {
       console.log('');
       console.log('🔨 正在打包 Android 应用...');
       try {
-        execSync('npm run build', { cwd: androidAppPath, stdio: 'inherit' });
+        execSync('npx vite build', { cwd: androidAppPath, stdio: 'inherit' });
         console.log('✅ Android 应用打包完成');
       } catch (error) {
         console.error('❌ Android 应用打包失败');
