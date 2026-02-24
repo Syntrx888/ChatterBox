@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-syntrx-50 text-gray-800 font-sans;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply bg-syntrx-900/80 backdrop-blur-md border border-syntrx-700/20;
+  }
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+  }
+  
+  @media (max-width: 640px) {
+    html {
+      font-size: 14px;
+    }
+  }
+}
+
+@layer components {
+  .mobile-container {
+    @apply max-w-md mx-auto px-4;
+  }
+  
+  .mobile-card {
+    @apply rounded-lg shadow-sm p-4;
+  }
+  
+  .mobile-input {
+    @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-syntrx-500;
+  }
+  
+  .mobile-button {
+    @apply w-full px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+}

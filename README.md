@@ -26,12 +26,17 @@
 - **安全认证**：JWT Token 认证机制
 - **响应式设计**：适配移动端和桌面端
 - **高度可配置**：支持自定义聊天室名称、图标、头像等
+- **多平台支持**：
+  - Web 端：Vue 3 + Vite
+  - Android 端：NativeScript 原生应用（非 WebView）
+  - Android 原生消息通知
+  - 前台服务保持连接
 
 ## 项目结构
 
 ```
 ChatterBox/
-├── client/                 # 前端项目
+├── client/                 # 前端项目（Web）
 │   ├── src/
 │   │   ├── config.js      # 前端配置文件
 │   │   ├── views/         # 页面组件
@@ -44,10 +49,19 @@ ChatterBox/
 │   ├── index.js           # 服务器入口
 │   ├── database.js        # 数据库配置
 │   └── package.json
+├── android/               # Android 原生应用
+│   ├── app/
+│   │   ├── components/    # Vue 组件
+│   │   ├── views/         # 页面视图
+│   │   ├── services/      # 服务（通知、前台服务）
+│   │   ├── config.js      # Android 配置文件
+│   │   └── App_Resources/ # Android 资源
+│   ├── setup.js           # Android 配置向导
+│   └── README.md         # Android 应用文档
 ├── screenshots/           # 项目截图
 ├── README.md             # 项目文档
-└── CONFIG.md             # 详细配置指南
-└──setup.js         #引导程序
+├── CONFIG.md             # 详细配置指南
+└── setup.js              # Web 配置引导程序
 ```
 
 > **提示**: 想了解更多配置细节和部署方案，请查看 [CONFIG.md](./CONFIG.md) 详细配置指南。
@@ -95,6 +109,16 @@ npm start
 #### 启动前端
 使用任意网站服务器将dist目录作为网站目录
 
+#### 启动 Android 应用
+
+```bash
+cd android
+npm install
+node setup.js
+npm run android
+```
+
+详细说明请查看 [android/README.md](./android/README.md)
 
 ### 手动配置
 

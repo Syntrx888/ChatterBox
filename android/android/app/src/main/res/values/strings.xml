@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ChatterBox</string>
+    <string name="title_activity_main">ChatterBox</string>
+    <string name="package_name">com.syntrx.chatterbox</string>
+    <string name="custom_url_scheme">com.syntrx.chatterbox</string>
+</resources>

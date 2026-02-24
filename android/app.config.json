@@ -1,0 +1,21 @@
+{
+  "app": {
+    "appId": "com.syntrx.chatterbox",
+    "appName": "ChatterBox",
+    "version": "1.0.0",
+    "webDir": "dist"
+  },
+  "server": {
+    "API_BASE_URL": "http://localhost:3000"
+  },
+  "chat": {
+    "chatRoomName": "ChatterBox",
+    "defaultAvatar": "/default-avatar.png",
+    "faviconUrl": "/favicon.png"
+  },
+  "android": {
+    "buildType": "debug",
+    "minSdkVersion": 21,
+    "targetSdkVersion": 34
+  }
+}

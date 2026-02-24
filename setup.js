@@ -47,6 +47,20 @@ async function main() {
       process.exit(1);
     }
 
+    const androidAppPath = path.join(__dirname, 'android-app');
+    if (fs.existsSync(androidAppPath)) {
+      console.log('');
+      console.log('📦 正在安装 Android 应用依赖...');
+      try {
+        execSync('npm install', { cwd: androidAppPath, stdio: 'inherit' });
+        console.log('✅ Android 应用依赖安装完成');
+      } catch (error) {
+        console.error('❌ Android 应用依赖安装失败');
+        rl.close();
+        process.exit(1);
+      }
+    }
+
     console.log('');
     console.log('========================================');
     console.log('  第二步：配置项目');
@@ -139,6 +153,23 @@ export default {
     fs.writeFileSync(path.join(__dirname, 'server', 'config.js'), backendConfig, 'utf8');
     console.log('✅ 后端配置完成');
 
+    if (fs.existsSync(androidAppPath)) {
+      console.log('');
+      console.log('📝 配置 Android 应用...');
+      const androidConfig = `const API_BASE_URL = '${normalizedApiUrl}';
+
+export default {
+  API_BASE_URL: API_BASE_URL.replace(/\\/+$/, ''),
+  chatRoomName: '${chatRoomName}',
+  faviconUrl: '${faviconUrl}',
+  defaultAvatar: '${defaultAvatar}',
+  enableInviteCode: ${enableInviteCode}
+}
+`;
+      fs.writeFileSync(path.join(androidAppPath, 'src', 'config.js'), androidConfig, 'utf8');
+      console.log('✅ Android 应用配置完成');
+    }
+
     console.log('');
     console.log('========================================');
     console.log('  第四步：打包前端');
@@ -155,6 +186,19 @@ export default {
       process.exit(1);
     }
 
+    if (fs.existsSync(androidAppPath)) {
+      console.log('');
+      console.log('🔨 正在打包 Android 应用...');
+      try {
+        execSync('npm run build', { cwd: androidAppPath, stdio: 'inherit' });
+        console.log('✅ Android 应用打包完成');
+      } catch (error) {
+        console.error('❌ Android 应用打包失败');
+        rl.close();
+        process.exit(1);
+      }
+    }
+
     console.log('');
     console.log('========================================');
     console.log('  配置完成！');
@@ -162,7 +206,16 @@ export default {
     console.log('');
     console.log('前端打包后的文件位于: client/dist/');
     console.log('后端配置文件位于: server/config.js');
-    console.log('');
+    
+    if (fs.existsSync(androidAppPath)) {
+      console.log('Android 应用打包后的文件位于: android-app/dist/');
+      console.log('');
+      console.log('构建 Android APK：');
+      console.log('  cd android-app');
+      console.log('  node build.js');
+      console.log('');
+    }
+    
     console.log('启动后端服务器：');
     console.log('  cd server');
     console.log('  npm start');
