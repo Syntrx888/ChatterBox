@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#E6F3FF] to-white p-4">
+  <div class="min-h-screen bg-gradient-to-b from-[#E6F3FF] to-white p-4 pt-safe">
     <div class="max-w-lg mx-auto">
-      <header class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <header class="bg-white rounded-xl shadow-lg p-4 mb-4 mt-2">
         <div class="flex items-center justify-between mb-2">
           <div>
-            <h1 class="text-2xl font-bold text-syntrx-800">个人设置</h1>
+            <h1 class="text-lg font-bold text-syntrx-800">个人设置</h1>
             <div class="text-xs text-syntrx-400 mt-0.5">
               Powered by <a href="https://github.com/Syntrx888/ChatterBox" target="_blank" rel="noopener noreferrer" class="text-syntrx-400 hover:text-syntrx-500 underline decoration-dotted underline-offset-2">ChatterBox</a>
             </div>
           </div>
           <router-link
             to="/chat"
-            class="px-4 py-2 bg-syntrx-100 hover:bg-syntrx-200 text-syntrx-700 rounded-lg transition-colors"
+            class="px-3 py-1.5 bg-syntrx-100 hover:bg-syntrx-200 text-syntrx-700 rounded-lg transition-colors text-sm"
           >
             返回
           </router-link>
@@ -66,7 +66,7 @@
 
       <button
         @click="handleLogout"
-        class="w-full mt-8 bg-[#FF4D4F] hover:bg-[#ff7875] text-white py-4 rounded-xl font-medium transition-colors shadow-md hover:shadow-lg"
+        class="w-full mt-6 bg-[#FF4D4F] hover:bg-[#ff7875] text-white py-2.5 rounded-lg font-medium transition-colors shadow-sm text-sm"
       >
         退出登录
       </button>
@@ -74,7 +74,7 @@
 
     <div v-if="showAvatarModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">更换头像</h2>
+        <h2 class="text-lg font-bold text-gray-800 mb-6 text-center">更换头像</h2>
         <div class="space-y-4">
           <button
             @click="selectDefaultAvatar"
@@ -147,7 +147,7 @@
 
     <div v-if="showDescriptionModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">编辑个人描述</h2>
+        <h2 class="text-lg font-bold text-gray-800 mb-6 text-center">编辑个人描述</h2>
         <div class="space-y-4">
           <div>
             <textarea
@@ -182,7 +182,7 @@
 
     <div v-if="showPasswordModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
       <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">修改密码</h2>
+        <h2 class="text-lg font-bold text-gray-800 mb-6 text-center">修改密码</h2>
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">旧密码</label>

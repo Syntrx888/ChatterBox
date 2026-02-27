@@ -7,6 +7,7 @@ const routes = [
   { path: '/', component: () => import('./views/LoadingView.vue') },
   { path: '/auth', component: () => import('./views/AuthView.vue') },
   { path: '/chat', component: () => import('./views/ChatView.vue'), meta: { requiresAuth: true } },
+  { path: '/admin', component: () => import('./views/AdminView.vue') },
   { path: '/members', component: () => import('./views/MembersView.vue'), meta: { requiresAuth: true } },
   { path: '/settings', component: () => import('./views/SettingsView.vue'), meta: { requiresAuth: true } }
 ]

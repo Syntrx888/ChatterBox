@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-[#D0E8F9] to-white flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden scale-[0.95] origin-center">
       <div class="h-1 bg-syntrx-400 transition-all duration-500" :style="{ width: progressWidth }"></div>
       
       <div class="p-8">
@@ -14,8 +14,8 @@
                   <div class="w-3 h-3 bg-syntrx-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
                 </div>
               </div>
-              <h1 class="text-3xl font-bold text-gray-800 mb-3">嗨，你好！</h1>
-              <h2 class="text-2xl font-bold text-syntrx-600 mb-4">欢迎来到 {{ config.chatRoomName }}</h2>
+              <h1 class="text-2xl font-bold text-gray-800 mb-3">嗨，你好！</h1>
+              <h2 class="text-xl font-bold text-syntrx-600 mb-4">欢迎来到 {{ config.chatRoomName }}</h2>
               <p class="text-gray-600 mb-8">只需 {{ config.enableInviteCode ? 5 : 4 }} 步，即可开启畅聊。</p>
               <button
                 @click="config.enableInviteCode ? (currentStep = 'inviteCode') : (currentStep = 'username')"
@@ -23,10 +23,10 @@
               >
                 开始注册
               </button>
-              <div class="mt-6">
+              <div class="mt-6 text-center">
                 <button
                   @click="showLogin = true"
-                  class="text-syntrx-600 hover:text-syntrx-700 transition-colors"
+                  class="text-syntrx-600 hover:text-syntrx-700 transition-colors text-sm"
                 >
                   已经注册账号？跳转到登录页
                 </button>
@@ -53,7 +53,7 @@
                       昵称可用
                     </span>
                     <span v-else-if="usernameStatus.available === false" class="text-red-600 flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 00016zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
                       {{ usernameStatus.error || '昵称已被占用' }}
                     </span>
                   </div>
@@ -114,7 +114,7 @@
                       邀请码有效
                     </span>
                     <span v-else-if="inviteCodeStatus.valid === false" class="text-red-600 flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 00016zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
+                      <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path></svg>
                       邀请码无效
                     </span>
                   </div>
@@ -248,9 +248,9 @@
       </div>
     </div>
 
-    <div v-if="showLogin" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">登录</h2>
+    <div v-if="showLogin" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+      <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6 scale-[0.95] origin-center my-auto">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">登录</h2>
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
@@ -553,6 +553,98 @@ watch(() => currentStep.value, () => {
     formData.value.avatar = defaultAvatar
   }
 })
+
+// 网络测试函数
+const testNetwork = async () => {
+  const results = []
+  const testUrl = `${config.API_BASE_URL}/api/check-invite-code?inviteCode=test`
+  
+  // 测试1: 原生 fetch
+  try {
+    const start = Date.now()
+    const response = await fetch(testUrl, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-cache',
+    })
+    const data = await response.json()
+    results.push({
+      method: 'fetch',
+      status: 'success',
+      time: Date.now() - start,
+      data: data
+    })
+  } catch (error) {
+    results.push({
+      method: 'fetch',
+      status: 'error',
+      error: error.message,
+      name: error.name,
+      stack: error.stack?.substring(0, 200)
+    })
+  }
+  
+  // 测试2: XMLHttpRequest
+  try {
+    const start = Date.now()
+    const xhr = new XMLHttpRequest()
+    xhr.open('GET', testUrl, false)
+    xhr.send()
+    results.push({
+      method: 'XMLHttpRequest',
+      status: xhr.status === 200 ? 'success' : 'error',
+      time: Date.now() - start,
+      statusCode: xhr.status,
+      response: xhr.responseText?.substring(0, 100)
+    })
+  } catch (error) {
+    results.push({
+      method: 'XMLHttpRequest',
+      status: 'error',
+      error: error.message,
+      name: error.name
+    })
+  }
+  
+  // 测试3: 图片加载测试
+  try {
+    const start = Date.now()
+    const img = new Image()
+    await new Promise((resolve, reject) => {
+      img.onload = resolve
+      img.onerror = reject
+      img.src = `${config.API_BASE_URL}/health?t=${Date.now()}`
+      setTimeout(() => reject(new Error('timeout')), 5000)
+    })
+    results.push({
+      method: 'image-load',
+      status: 'success',
+      time: Date.now() - start
+    })
+  } catch (error) {
+    results.push({
+      method: 'image-load',
+      status: 'error',
+      error: error.message
+    })
+  }
+  
+  // 添加环境信息
+  results.push({
+    method: 'env',
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    time: new Date().toISOString(),
+    url: testUrl
+  })
+  
+  // 显示结果
+  alert(JSON.stringify(results, null, 2))
+  console.log('网络测试结果:', results)
+}
+
+// 添加到 window 方便调试
+window.testNetwork = testNetwork
 </script>
 
 <style scoped>

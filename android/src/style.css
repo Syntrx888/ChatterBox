@@ -3,8 +3,15 @@
 @tailwind utilities;
 
 @layer base {
-  body {
+  html, body {
     @apply bg-syntrx-50 text-gray-800 font-sans;
+    min-height: 100%;
+    height: auto;
+  }
+  
+  #app {
+    min-height: 100vh;
+    height: auto;
   }
 }
 
@@ -16,34 +23,63 @@
   .glass-dark {
     @apply bg-syntrx-900/80 backdrop-blur-md border border-syntrx-700/20;
   }
-}
-
-@layer base {
-  html {
-    font-size: 16px;
-  }
   
-  @media (max-width: 640px) {
-    html {
-      font-size: 14px;
-    }
-  }
-}
-
-@layer components {
   .mobile-container {
-    @apply max-w-md mx-auto px-4;
+    @apply max-w-3xl mx-auto px-4;
   }
-  
-  .mobile-card {
-    @apply rounded-lg shadow-sm p-4;
-  }
-  
-  .mobile-input {
-    @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-syntrx-500;
-  }
-  
-  .mobile-button {
-    @apply w-full px-4 py-2 rounded-lg font-medium transition-colors;
-  }
+}
+
+/* 透明状态栏适配 */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 安全区域顶部内边距 */
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top), 24px);
+}
+
+/* 安全区域底部内边距 */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 8px);
+}
+
+/* 聊天容器适配 */
+.chat-container {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.chat-main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* 确保输入框在键盘弹出时可见 */
+input:focus {
+  scroll-margin-bottom: 100px;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }

@@ -1,5 +1,5 @@
 {
-  "name": "chatterbox-android",
+  "name": "chatterbox-client",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -7,15 +7,16 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "sync": "npm run build && npx cap sync android",
-    "open": "npx cap open android",
-    "run": "npx cap run android",
-    "build-apk": "node build.js"
+    "build:android": "node build.js",
+    "build:android:release": "node build.js --release"
   },
   "dependencies": {
     "@capacitor/android": "^8.1.0",
+    "@capacitor/app": "^8.0.1",
+    "@capacitor/background-runner": "^3.0.0",
     "@capacitor/cli": "^8.1.0",
     "@capacitor/core": "^8.1.0",
+    "@capacitor/keyboard": "^8.0.1",
     "@capacitor/local-notifications": "^8.0.1",
     "axios": "^1.5.0",
     "socket.io-client": "^4.7.2",

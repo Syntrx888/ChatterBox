@@ -1,17 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-[#E6F3FF] to-white p-4">
+  <div class="min-h-screen bg-gradient-to-b from-[#E6F3FF] to-white p-4 pt-safe">
     <div class="max-w-6xl mx-auto">
-      <header class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <header class="bg-white rounded-xl shadow-lg p-4 mb-4 mt-2">
         <div class="flex items-center justify-between mb-2">
           <div>
-            <h1 class="text-3xl font-bold text-syntrx-800">聊天室成员</h1>
+            <h1 class="text-lg font-bold text-syntrx-800">聊天室成员</h1>
             <div class="text-xs text-syntrx-400 mt-0.5">
               Powered by <a href="https://github.com/Syntrx888/ChatterBox" target="_blank" rel="noopener noreferrer" class="text-syntrx-400 hover:text-syntrx-500 underline decoration-dotted underline-offset-2">ChatterBox</a>
             </div>
           </div>
           <router-link
             to="/chat"
-            class="px-4 py-2 bg-syntrx-600 hover:bg-syntrx-700 text-white rounded-lg transition-colors"
+            class="px-3 py-1.5 bg-syntrx-600 hover:bg-syntrx-700 text-white rounded-lg transition-colors text-sm"
           >
             返回聊天室
           </router-link>

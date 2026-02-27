@@ -47,7 +47,7 @@ async function main() {
       process.exit(1);
     }
 
-    const androidAppPath = path.join(__dirname, 'android-app');
+    const androidAppPath = path.join(__dirname, 'android');
     if (fs.existsSync(androidAppPath)) {
       console.log('');
       console.log('📦 正在安装 Android 应用依赖...');
@@ -221,10 +221,10 @@ export default {
     console.log('后端配置文件位于: server/config.js');
     
     if (fs.existsSync(androidAppPath)) {
-      console.log('Android 应用打包后的文件位于: android-app/dist/');
+      console.log('Android 应用打包后的文件位于: android/dist/');
       console.log('');
       console.log('构建 Android APK：');
-      console.log('  cd android-app');
+      console.log('  cd android');
       console.log('  node build.js');
       console.log('');
     }

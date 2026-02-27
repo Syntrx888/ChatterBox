@@ -1,146 +1,167 @@
 #!/usr/bin/env node
 
 import { execSync } from 'child_process';
-import fs from 'fs';
-import path from 'path';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { join, dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
+import readline from 'readline';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  green: '\x1b[32m',
   red: '\x1b[31m',
+  green: '\x1b[32m',
   yellow: '\x1b[33m',
-  blue: '\x1b[34m'
+  blue: '\x1b[34m',
+  bright: '\x1b[1m',
+  reset: '\x1b[0m'
 };
 
-function log(message, color = colors.reset) {
-  console.log(`${color}${message}${colors.reset}`);
-}
-
-function logStep(step, message) {
-  console.log('');
-  log(`步骤 ${step}: ${message}`, colors.bright);
+function log(msg, color = colors.reset) {
+  console.log(`${color}${msg}${colors.reset}`);
 }
 
 function runCommand(command, description) {
+  log(`\n▶ ${description}...`, colors.blue);
   try {
-    log(`  → ${description}...`, colors.blue);
-    execSync(command, { stdio: 'inherit', cwd: __dirname });
-    log(`  ✓ ${description}完成`, colors.green);
+    execSync(command, { cwd: __dirname, stdio: 'inherit', shell: true });
+    log(`✅ ${description}完成`, colors.green);
     return true;
   } catch (error) {
-    log(`  ✗ ${description}失败`, colors.red);
+    log(`❌ ${description}失败: ${error.message}`, colors.red);
     return false;
   }
 }
 
-function checkEnvironment() {
-  logStep(1, '检查环境');
-  
-  try {
-    const nodeVersion = execSync('node --version', { encoding: 'utf-8' }).trim();
-    log(`  ✓ Node.js 版本: ${nodeVersion}`, colors.green);
-  } catch (error) {
-    log('  ✗ 错误: Node.js 未安装', colors.red);
-    process.exit(1);
-  }
+function askQuestion(question, defaultValue = '') {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-  try {
-    const javaVersion = execSync('java -version 2>&1', { encoding: 'utf-8' }).split('\n')[0];
-    log(`  ✓ Java 版本: ${javaVersion}`, colors.green);
-  } catch (error) {
-    log('  ✗ 错误: Java 未安装', colors.red);
-    process.exit(1);
-  }
+  return new Promise((resolve) => {
+    rl.question(`${question} [${defaultValue}]: `, (answer) => {
+      rl.close();
+      resolve(answer || defaultValue);
+    });
+  });
 }
 
-function installDependencies() {
-  logStep(2, '安装依赖');
-  return runCommand('npm install', '依赖安装');
+async function getUserConfig() {
+  log('\n=========================================', colors.bright);
+  log('  应用配置', colors.bright);
+  log('=========================================', colors.bright);
+
+  const appName = await askQuestion('应用名称', 'ChatterBox');
+  const packageName = await askQuestion('包名 (如: com.example.app)', 'com.syntrx.chatterbox');
+  const iconAnswer = await askQuestion('使用默认图标? (y/n)', 'y');
+  const useDefaultIcon = iconAnswer.toLowerCase() === 'y';
+
+  return { appName, packageName, useDefaultIcon };
 }
 
-function initAndroidPlatform() {
-  logStep(3, '初始化 Capacitor Android 平台');
-  
-  const androidDir = path.join(__dirname, 'android');
-  if (!fs.existsSync(androidDir)) {
-    return runCommand('npx cap add android', 'Android 平台初始化');
-  } else {
-    log('  ✓ Android 平台已存在', colors.green);
-    return true;
-  }
+function updateCapacitorConfig(config) {
+  const configPath = join(__dirname, 'capacitor.config.json');
+  const currentConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
+
+  currentConfig.appName = config.appName;
+  currentConfig.appId = config.packageName;
+
+  writeFileSync(configPath, JSON.stringify(currentConfig, null, 2));
+  log(`✅ 已更新 capacitor.config.json`, colors.green);
 }
 
-function buildFrontend() {
-  logStep(4, '构建前端');
-  return runCommand('npm run build', '前端构建');
+function updateBuildGradle(config) {
+  const gradlePath = join(__dirname, 'android', 'app', 'build.gradle');
+  let content = readFileSync(gradlePath, 'utf-8');
+
+  content = content.replace(/applicationId\s+"[^"]+"/, `applicationId "${config.packageName}"`);
+
+  writeFileSync(gradlePath, content);
+  log(`✅ 已更新 build.gradle`, colors.green);
 }
 
-function syncToAndroid() {
-  logStep(5, '同步到 Android');
-  return runCommand('npx cap sync android', '同步');
+function updateManifest(config) {
+  const manifestPath = join(__dirname, 'android', 'app', 'src', 'main', 'AndroidManifest.xml');
+  let content = readFileSync(manifestPath, 'utf-8');
+
+  content = content.replace(/android:label="[^"]+"/, `android:label="${config.appName}"`);
+
+  writeFileSync(manifestPath, content);
+  log(`✅ 已更新 AndroidManifest.xml`, colors.green);
+
+  const stringsPath = join(__dirname, 'android', 'app', 'src', 'main', 'res', 'values', 'strings.xml');
+  let stringsContent = readFileSync(stringsPath, 'utf-8');
+
+  stringsContent = stringsContent.replace(/<string name="app_name">[^<]+<\/string>/, `<string name="app_name">${config.appName}</string>`);
+  stringsContent = stringsContent.replace(/<string name="title_activity_main">[^<]+<\/string>/, `<string name="title_activity_main">${config.appName}</string>`);
+
+  writeFileSync(stringsPath, stringsContent);
+  log(`✅ 已更新 strings.xml`, colors.green);
 }
 
-function buildAPK() {
-  logStep(6, '构建 APK');
-  
-  const androidDir = path.join(__dirname, 'android');
-  const gradlewPath = path.join(androidDir, process.platform === 'win32' ? 'gradlew.bat' : 'gradlew');
-  
-  if (!fs.existsSync(gradlewPath)) {
-    log('  ✗ 错误: gradlew 不存在', colors.red);
+function checkConfig() {
+  const configPath = join(__dirname, 'src', 'config.js');
+  if (!existsSync(configPath)) {
+    log('❌ 错误: src/config.js 不存在', colors.red);
+    log('请创建 config.js 文件并配置后端地址', colors.yellow);
     return false;
   }
 
-  const gradlewCommand = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
-  // 添加 -Pandroid.enableAapt2Daemon=false 禁用 AAPT2 Daemon 以解决 Windows 上的问题
-  return runCommand(`cd android && ${gradlewCommand} assembleDebug -Pandroid.enableAapt2Daemon=false`, 'APK 构建');
+  const configContent = readFileSync(configPath, 'utf-8');
+  if (configContent.includes('your-backend-url.com')) {
+    log('⚠️  警告: config.js 中的后端地址还是默认值', colors.yellow);
+    log('请修改 src/config.js 中的 API_BASE_URL', colors.yellow);
+  }
+
+  return true;
 }
 
 async function main() {
+  const args = process.argv.slice(2);
+  const buildType = args.includes('--release') ? 'release' : 'debug';
+
   log('=========================================', colors.bright);
-  log('  ChatterBox Android 一键配置打包脚本', colors.bright);
+  log('  ChatterBox Android 构建脚本', colors.bright);
   log('=========================================', colors.bright);
+  log(`\n构建类型: ${buildType === 'release' ? '发布版' : '调试版'}`, colors.yellow);
 
-  try {
-    checkEnvironment();
-    
-    if (!installDependencies()) {
-      process.exit(1);
-    }
+  const userConfig = await getUserConfig();
 
-    if (!initAndroidPlatform()) {
-      process.exit(1);
-    }
+  updateCapacitorConfig(userConfig);
+  updateBuildGradle(userConfig);
+  updateManifest(userConfig);
 
-    if (!buildFrontend()) {
-      process.exit(1);
-    }
-
-    if (!syncToAndroid()) {
-      process.exit(1);
-    }
-
-    if (!buildAPK()) {
-      process.exit(1);
-    }
-
-    log('');
-    log('=========================================', colors.bright);
-    log('  构建成功！', colors.green);
-    log('=========================================', colors.bright);
-    log('');
-    log('APK 位置:', colors.yellow);
-    log('  android/app/build/outputs/apk/debug/app-debug.apk', colors.blue);
-    log('');
-  } catch (error) {
-    log(`\n✗ 构建失败: ${error.message}`, colors.red);
+  if (!checkConfig()) {
     process.exit(1);
   }
+
+  if (!runCommand('npm run build', '构建前端')) {
+    process.exit(1);
+  }
+
+  if (!runCommand('npx cap sync android', '同步到 Android')) {
+    process.exit(1);
+  }
+
+  const gradlewCmd = process.platform === 'win32' ? 'gradlew.bat' : './gradlew';
+  const task = buildType === 'release' ? 'assembleRelease' : 'assembleDebug';
+
+  if (!runCommand(`cd android && ${gradlewCmd} ${task}`, `构建 ${buildType === 'release' ? '发布版' : '调试版'} APK`)) {
+    process.exit(1);
+  }
+
+  log('\n=========================================', colors.bright);
+  log('  ✅ 构建成功！', colors.green);
+  log('=========================================', colors.bright);
+
+  const apkPath = buildType === 'release'
+    ? join(__dirname, 'android', 'app', 'build', 'outputs', 'apk', 'release', 'app-release.apk')
+    : join(__dirname, 'android', 'app', 'build', 'outputs', 'apk', 'debug', 'app-debug.apk');
+
+  log(`\nAPK 位置: ${apkPath}`, colors.green);
+  log('\n安装命令:', colors.blue);
+  log(`adb install "${apkPath}"`, colors.reset);
 }
 
 main();
